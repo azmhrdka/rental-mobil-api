@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y openssl
 
 COPY . .
 
-RUN npm run build
+RUN npm run build && ls -la dist/
 
 EXPOSE 3000
 
