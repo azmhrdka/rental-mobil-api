@@ -2,17 +2,14 @@ FROM node:20
 
 WORKDIR /app
 
-# cache bust: v2
+RUN apt-get update && apt-get install -y openssl
+
 COPY package*.json ./
 COPY prisma ./prisma/
 
 RUN npm install
 
-RUN apt-get update && apt-get install -y openssl
-
-COPY . .
-
-RUN npm run build && ls -la dist/
+COPY dist ./dist/
 
 EXPOSE 3000
 
