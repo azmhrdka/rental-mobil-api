@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  nama       String
+  email      String      @unique
+  password   String
+  no_hp      String?
+  alamat     String?     @db.Text
+  role       Role        @default(PELANGGAN)
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  pemesanan  Pemesanan[]
+
+  @@map("users")
+}
+
+model Mobil {
+  id             Int         @id @default(autoincrement())
+  nama_mobil     String
+  merek          String
+  model          String
+  tahun          Int
+  transmisi      Transmisi
+  kapasitas      Int
+  harga_per_hari Decimal     @db.Decimal(10, 2)
+  status         StatusMobil @default(TERSEDIA)
+  foto           String?
+  deskripsi      String?     @db.Text
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  pemesanan      Pemesanan[]
+
+  @@map("mobil")
+}
+
+model Pemesanan {
+  id              Int             @id @default(autoincrement())
+  user            User            @relation(fields: [user_id], references: [id])
+  user_id         Int
+  mobil           Mobil           @relation(fields: [mobil_id], references: [id])
+  mobil_id        Int
+  tanggal_mulai   DateTime        @db.Date
+  tanggal_selesai DateTime        @db.Date
+  total_hari      Int
+  total_harga     Decimal         @db.Decimal(12, 2)
+  status          StatusPemesanan @default(PENDING)
+  catatan         String?         @db.Text
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  pembayaran      Pembayaran?
+
+  @@map("pemesanan")
+}
+
+model Pembayaran {
+  id             Int              @id @default(autoincrement())
+  pemesanan      Pemesanan        @relation(fields: [pemesanan_id], references: [id])
+  pemesanan_id   Int              @unique
+  jumlah         Decimal          @db.Decimal(12, 2)
+  metode         MetodePembayaran
+  status         StatusPembayaran @default(BELUM_BAYAR)
+  bukti_transfer String?
+  tanggal_bayar  DateTime?
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+
+  @@map("pembayaran")
+}
+
+enum Role {
+  ADMIN
+  PELANGGAN
+}
+
+enum Transmisi {
+  MANUAL
+  OTOMATIS
+}
+
+enum StatusMobil {
+  TERSEDIA
+  DISEWA
+  PERAWATAN
+}
+
+enum StatusPemesanan {
+  PENDING
+  DIKONFIRMASI
+  AKTIF
+  SELESAI
+  DIBATALKAN
+}
+
+enum MetodePembayaran {
+  TRANSFER_BANK
+  TUNAI
+  QRIS
+}
+
+enum StatusPembayaran {
+  BELUM_BAYAR
+  LUNAS
+  REFUND
+}
