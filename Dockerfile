@@ -2,6 +2,7 @@ FROM node:20
 
 WORKDIR /app
 
+# cache bust: v2
 COPY package*.json ./
 COPY prisma ./prisma/
 
