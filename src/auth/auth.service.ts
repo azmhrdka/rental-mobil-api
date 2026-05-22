@@ -33,7 +33,15 @@ export class AuthService {
       },
     });
 
-    return this.signToken(user.id, user.email, user.role);
+    return {
+      message: 'Registrasi berhasil, silakan login',
+      user: {
+        id: user.id,
+        nama: user.nama,
+        email: user.email,
+        role: user.role,
+  },
+};
   }
 
   async login(dto: LoginDto) {
